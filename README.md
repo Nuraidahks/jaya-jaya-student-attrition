@@ -1,7 +1,7 @@
 # Proyek Akhir: Menyelesaikan Permasalahan Perusahaan Edutech (Human Resources Division)
 
 Link Looker Studio: https://datastudio.google.com/reporting/140be2c6-1cb8-42c4-ba1c-1b8d2860a5dc
-Akses Aplikasi Streamlit: [Masukkan Link Streamlit Community Cloud Anda di sini nanti]
+Akses Aplikasi Streamlit: https://jaya-jaya-student-attrition-nuraidahks-prototype.streamlit.app/
 
 
 ## Business Understanding
