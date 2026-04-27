@@ -111,20 +111,18 @@ with tab2:
     st.write("Grafik di bawah ini menunjukkan variabel mana saja yang memiliki bobot terbesar dalam menentukan status mahasiswa. Visualisasi ini di-generate langsung secara dinamis dari model Anda.")
     
     # Mengekstrak Feature Importance dari Random Forest
+   # Ambil nilai pengaruh dari model
     importances = model.feature_importances_
-    
-    # Kita buat list kolom manual untuk label grafik (harus 25 urutannya sama)
-    feature_names = [
-        'Marital_status', 'Application_mode', 'Application_order', 'Course', 
-        'Daytime_attendance', 'Prev_qualification', 'Prev_qual_grade', 
-        'Mothers_qual', 'Fathers_qual', 'Admission_grade', 
-        'Displaced', 'Edu_special_needs', 'Debtor', 'Tuition_up_to_date', 
-        'Gender', 'Scholarship', 'International', 
-        'Sem1_evaluations', 'Sem2_credited', 
-        'Sem2_enrolled', 'Sem2_evaluations', 
-        'Financial_Risk', 'Total_Approved_Units', 
-        'Avg_Grade_1st_Year', 'Age_Group'
-    ]
+
+    # (Solusi Otomatis) Ambil nama fitur langsung dari model yang disimpan!
+    feature_names = model.feature_names_in_
+
+    # Gabungkan menjadi DataFrame
+    fi_df = pd.DataFrame({
+        'Fitur': feature_names, 
+        'Pengaruh (%)': importances * 100
+    })
+
     
     # Membuat DataFrame untuk Plotting
     fi_df = pd.DataFrame({'Fitur': feature_names, 'Pengaruh (%)': importances * 100})
