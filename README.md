@@ -46,11 +46,7 @@ Proyek ini tidak berhenti pada script Python, melainkan diimplementasikan ke dal
 
  - Aplikasi Prediksi Individu (Streamlit): Membangun aplikasi web interaktif menggunakan antarmuka Python (app.py). Aplikasi ini dilengkapi dengan perhitungan tingkat keyakinan (Prediction Probability) secara real-time untuk memudahkan Dosen Pembimbing melakukan asesmen profil satu mahasiswa secara cepat.
 
- - Dashboard Monitoring Eksekutif (Looker Studio): Menyiapkan dataset khusus (looker_dataset_with_ai.csv) yang menggabungkan data aktual dengan prediksi AI. Dashboard ini menyajikan:
-
-    a. Tabel "Actionable List" (Daftar prioritas intervensi mahasiswa berisiko).
-    b. Evaluasi kinerja model secara live (Confusion Matrix / AI Accuracy Tracker).
-    c. Visualisasi sebaran nilai masuk mahasiswa dan performa akademik.
+ - Dashboard Monitoring Eksekutif (Looker Studio): Menyiapkan dataset khusus (looker_dataset_with_ai.csv) yang menggabungkan data aktual dengan prediksi AI. Dashboard ini menyajikan visualisasi sebaran nilai masuk mahasiswa dan performa akademik dan evaluasi kinerja model secara live (Confusion Matrix / AI Accuracy Tracker).
 
 
 ### Persiapan
