@@ -29,20 +29,19 @@ Pada data preparation dilakukan feature engineering untuk membuat variabel turun
 a. Financial_Risk, indikator risiko keuangan gabungan antara status hutang dan kepemilikan beasiswa.
 b. Total_Approved_Units, total akumulasi beban SKS yang berhasil diselesaikan di tahun pertama.
 c. Age_Group, pengelompokan usia pendaftar menjadi Reguler, Dewasa Muda, dan Dewasa.
-
 Selain itu juga dilakukan Feature Selection dengan mereduksi dimensi dengan membuang fitur makroekonomi (GDP, Tingkat Inflasi, Pengangguran) dan fitur dengan kardinalitas tinggi yang dapat memicu noise pada model. Terakhir, Data Transformation dilakukan untuk mengubah data kategorikal dan teks (Dropout, Enrolled, Graduate) menjadi format numerik menggunakan teknik Label Encoding.
 
-4. Modeling (Pemodelan Machine Learning)
+5. Modeling (Pemodelan Machine Learning)
 a. Pemilihan algoritma menggunakan Random Forest Classifier yang tangguh dalam menangani data non-linear dan interaksi multivariabel.
 b. Hyperparameter Tuning dilakukan untuk mengoptimalkan algoritma menggunakan GridSearchCV untuk menguji puluhan kombinasi parameter secara otomatis.
 c. Penanganan Imbalanced Data menggunakan parameter class_weight='balanced' untuk memastikan algoritma tetap adil dan akurat dalam mendeteksi kelas minoritas (Enrolled) tanpa harus membuang data berharga dari kelas mayoritas (Graduate).
 
-5. Evaluation (Evaluasi Model)
+6. Evaluation (Evaluasi Model)
 a. Pengujian Metrik untuk mengevaluasi model menggunakan data uji (Test Set) dengan hasil tingkat akurasi akhir mencapai ~78.33%.
 b. Recall Optimization menunjukkan model berhasil mencapai target Recall >75% untuk kelas Dropout, memastikan kemampuan sistem dalam memprediksikan sebanyak mungkin mahasiswa berisiko.
 c. Interpretasi Model (Feature Importance) untuk mengekstrak bobot algoritma untuk menyimpulkan bahwa performa akademik semester 1 & 2, admission grade atau nilai masuk ke universitas serta kelancaran pembayaran SPP adalah prediktor absolut terkuat untuk kelulusan mahasiswa.
 
-6. Deployment & Business Intelligence (Implementasi & Visualisasi)
+7. Deployment & Business Intelligence (Implementasi & Visualisasi)
 Proyek ini tidak berhenti pada script Python, melainkan diimplementasikan ke dalam dua produk akhir yang siap pakai (production-ready):
 
  - Aplikasi Prediksi Individu (Streamlit): Membangun aplikasi web interaktif menggunakan antarmuka Python (app.py). Aplikasi ini dilengkapi dengan perhitungan tingkat keyakinan (Prediction Probability) secara real-time untuk memudahkan Dosen Pembimbing melakukan asesmen profil satu mahasiswa secara cepat.
