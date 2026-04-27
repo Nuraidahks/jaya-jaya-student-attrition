@@ -149,6 +149,6 @@ with tab2:
     fi_df = fi_df.sort_values(by='Pengaruh (%)', ascending=False).head(10)
     
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(x='Pengaruh (%)', y='Fitur', data=fi_df, palette='viridis', ax=ax)
+    sns.barplot(x='Pengaruh (%)', y='Fitur', data=fi_df, hue='Pengaruh (%)', palette='viridis', ax=ax, legend=False)
     plt.tight_layout()
     st.pyplot(fig)
