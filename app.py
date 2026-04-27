@@ -75,8 +75,6 @@ with tab1:
         else: age_group = 2 # Dewasa
 
         # --- MEMBUAT DATAFRAME INPUT ---
-        # Masukkan semua fitur dasar yang digunakan model (Total 26 fitur biasanya)
-        # Kami mengeset fitur teknis lainnya ke nilai default/median agar model tetap jalan
         input_data = {
             'Marital_status': 1, 'Application_mode': 1, 'Application_order': 1, 'Course': 9147,
             'Daytime_evening_attendance': 1, 'Previous_qualification': 1, 'Previous_qualification_grade': 120.0,
@@ -92,6 +90,9 @@ with tab1:
             'Curricular_units_2nd_sem_grade': sem2_grade,
             'Curricular_units_2nd_sem_approved': sem2_approved,
             'Curricular_units_2nd_sem_evaluations': sem2_evals,
+            # Menambahkan kolom yang terlewat
+            'Curricular_units_2nd_sem_credited': 0,
+            'Curricular_units_2nd_sem_enrolled': 6,
             'Admission_grade': admission_grade,
             'Financial_Risk': fin_risk,
             'Total_Approved_Units': total_approved,
@@ -100,10 +101,16 @@ with tab1:
         
         df_input = pd.DataFrame([input_data])
 
-        # --- SINKRONISASI KOLOM (FIXED VALUE ERROR) ---
-        # Mengatur urutan kolom agar TEPAT SAMA dengan yang diminta model
+        # --- SINKRONISASI KOLOM OTOMATIS (BULLETPROOF) ---
         try:
             expected_features = model.feature_names_in_
+            
+            # Jika ada kolom yang diminta model tapi belum ada di df_input, otomatis isi dengan 0
+            for col in expected_features:
+                if col not in df_input.columns:
+                    df_input[col] = 0
+                    
+            # Pastikan urutan kolom persis sama dengan model
             df_input = df_input[expected_features]
             
             # Eksekusi Prediksi
