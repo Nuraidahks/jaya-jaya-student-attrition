@@ -5,33 +5,37 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # ==========================================
-# 1. KONFIGURASI HALAMAN
+# 1. KONFIGURASI HALAMAN & MODEL
 # ==========================================
 st.set_page_config(page_title="Jaya Jaya Institut Analytics", page_icon="🎓", layout="wide")
 
 @st.cache_resource
 def load_model():
+    # Pastikan lokasi file .pkl sudah benar sesuai struktur repositori Anda
     return joblib.load('model/student_model_tuned.pkl')
 
 model = load_model()
 
+# Mengambil daftar fitur aktual yang dipelajari model saat training (26 fitur)
+expected_features = model.feature_names_in_
+
 # ==========================================
-# 2. HEADER
+# 2. HEADER APLIKASI
 # ==========================================
 st.title("🎓 Jaya Jaya Institut: Student Attrition Early Warning System")
-st.markdown("Sistem prediktif biner (Dropout vs Graduate) berdasarkan profil lengkap mahasiswa.")
+st.markdown(f"Sistem prediktif ini menggunakan **{len(expected_features)} indikator utama** untuk mendeteksi potensi *dropout* mahasiswa secara dini.")
 st.markdown("---")
 
-tab1, tab2 = st.tabs(["🔍 Prediksi Individu", "📊 Insight Model"])
+tab1, tab2 = st.tabs(["🔍 Prediksi Individu", "📊 Insight Algoritma"])
 
 # ==========================================
 # 3. TAB 1: FORM PREDIKSI (DYNAMIC INPUTS)
 # ==========================================
 with tab1:
     st.subheader("Input Profil Mahasiswa Secara Lengkap")
-    st.info("Silakan isi seluruh parameter di bawah ini sesuai dengan data historis mahasiswa. Tidak ada lagi data yang di-hardcode di sistem.")
+    st.info("Silakan isi parameter di bawah ini. Sistem secara otomatis akan menyeleksi fitur yang relevan dengan algoritma.")
     
-    # KELOMPOK 1: Demografi
+    # --- KELOMPOK 1: Demografi ---
     with st.expander("👤 1. Demografi & Latar Belakang", expanded=True):
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -47,7 +51,7 @@ with tab1:
             mothers_qual = st.number_input("Kualifikasi Ibu (Kode)", min_value=1, max_value=50, value=1)
             fathers_qual = st.number_input("Kualifikasi Ayah (Kode)", min_value=1, max_value=50, value=1)
 
-    # KELOMPOK 2: Akademik Awal & Ekonomi
+    # --- KELOMPOK 2: Akademik Awal & Ekonomi ---
     with st.expander("🎓 2. Akademik Awal & Finansial", expanded=True):
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -57,14 +61,14 @@ with tab1:
         with col2:
             app_mode = st.number_input("Jalur Pendaftaran (Kode)", min_value=1, max_value=60, value=1)
             app_order = st.number_input("Urutan Pilihan Jurusan", min_value=0, max_value=10, value=1)
-            prev_qual_grade = st.number_input("Nilai Kualifikasi Sebelumnya", min_value=0.0, max_value=200.0, value=120.0)
+            prev_qual_grade = st.number_input("Nilai Kualifikasi Sebelumnya", min_value=0.0, max_value=200.0, value=130.0)
         with col3:
             admission_grade = st.number_input("Nilai Masuk (Admission Grade)", min_value=0.0, max_value=200.0, value=120.0)
             scholarship = st.selectbox("Penerima Beasiswa?", options=[0, 1], format_func=lambda x: "Tidak (0)" if x==0 else "Ya (1)")
             tuition = st.selectbox("Status SPP (Up to date)?", options=[0, 1], format_func=lambda x: "Menunggak (0)" if x==0 else "Lancar (1)")
             debtor = st.selectbox("Punya Hutang/Tunggakan?", options=[0, 1], format_func=lambda x: "Tidak (0)" if x==0 else "Ya (1)")
 
-    # KELOMPOK 3: Performa Semester 1 & 2
+    # --- KELOMPOK 3: Performa Semester 1 & 2 ---
     with st.expander("📚 3. Performa Akademik (Semester 1 & 2)", expanded=True):
         st.markdown("**Semester 1**")
         c1, c2, c3, c4, c5, c6 = st.columns(6)
@@ -89,7 +93,6 @@ with tab1:
     if st.button("🚀 Jalankan Prediksi Algoritma", use_container_width=True):
         
         # --- PROSES FEATURE ENGINEERING ---
-        # Dihitung secara sistem berdasarkan inputan user, BUKAN di-hardcode
         if scholarship == 0 and debtor == 1: fin_risk = 2 # Tinggi
         elif scholarship == 1 and debtor == 0: fin_risk = 1 # Rendah
         else: fin_risk = 0 # Menengah
@@ -100,79 +103,54 @@ with tab1:
         elif age_at_enrollment <= 30: age_group = 1 
         else: age_group = 2 
 
-        # --- MEMBUAT DATAFRAME DARI INPUT USER ---
-        # Semua diambil dari variabel input, tidak ada lagi hardcode angka statis!
+        # --- MEMBUAT DATAFRAME KESELURUHAN ---
         input_data = {
-            'Marital_status': marital_status,
-            'Application_mode': app_mode,
-            'Application_order': app_order,
-            'Course': course,
-            'Daytime_evening_attendance': daytime_evening,
-            'Previous_qualification': prev_qual,
-            'Previous_qualification_grade': prev_qual_grade,
-            'Nacionality': nacionality,
-            'Mothers_qualification': mothers_qual,
-            'Fathers_qualification': fathers_qual,
-            'Admission_grade': admission_grade,
-            'Displaced': displaced,
-            'Educational_special_needs': special_needs,
-            'Debtor': debtor,
-            'Tuition_fees_up_to_date': tuition,
-            'Gender': gender,
-            'Scholarship_holder': scholarship,
-            'Age_at_enrollment': age_at_enrollment,
-            'International': international,
-            'Curricular_units_1st_sem_credited': s1_cred,
-            'Curricular_units_1st_sem_enrolled': s1_enrolled,
-            'Curricular_units_1st_sem_evaluations': s1_evals,
-            'Curricular_units_1st_sem_approved': s1_approved,
-            'Curricular_units_1st_sem_grade': s1_grade,
-            'Curricular_units_1st_sem_without_evaluations': s1_wo_evals,
-            'Curricular_units_2nd_sem_credited': s2_cred,
-            'Curricular_units_2nd_sem_enrolled': s2_enrolled,
-            'Curricular_units_2nd_sem_evaluations': s2_evals,
-            'Curricular_units_2nd_sem_approved': s2_approved,
-            'Curricular_units_2nd_sem_grade': s2_grade,
-            'Curricular_units_2nd_sem_without_evaluations': s2_wo_evals,
-            
-            # Fitur rekayasa (Engineered Features)
-            'Financial_Risk': fin_risk,
-            'Total_Approved_Units': total_approved,
-            'Age_Group': age_group
+            'Marital_status': marital_status, 'Application_mode': app_mode, 'Application_order': app_order,
+            'Course': course, 'Daytime_evening_attendance': daytime_evening, 'Previous_qualification': prev_qual,
+            'Previous_qualification_grade': prev_qual_grade, 'Nacionality': nacionality, 
+            'Mothers_qualification': mothers_qual, 'Fathers_qualification': fathers_qual,
+            'Admission_grade': admission_grade, 'Displaced': displaced, 'Educational_special_needs': special_needs,
+            'Debtor': debtor, 'Tuition_fees_up_to_date': tuition, 'Gender': gender,
+            'Scholarship_holder': scholarship, 'Age_at_enrollment': age_at_enrollment, 'International': international,
+            'Curricular_units_1st_sem_credited': s1_cred, 'Curricular_units_1st_sem_enrolled': s1_enrolled,
+            'Curricular_units_1st_sem_evaluations': s1_evals, 'Curricular_units_1st_sem_approved': s1_approved,
+            'Curricular_units_1st_sem_grade': s1_grade, 'Curricular_units_1st_sem_without_evaluations': s1_wo_evals,
+            'Curricular_units_2nd_sem_credited': s2_cred, 'Curricular_units_2nd_sem_enrolled': s2_enrolled,
+            'Curricular_units_2nd_sem_evaluations': s2_evals, 'Curricular_units_2nd_sem_approved': s2_approved,
+            'Curricular_units_2nd_sem_grade': s2_grade, 'Curricular_units_2nd_sem_without_evaluations': s2_wo_evals,
+            'Financial_Risk': fin_risk, 'Total_Approved_Units': total_approved, 'Age_Group': age_group
         }
         
         df_input = pd.DataFrame([input_data])
 
-        # --- SINKRONISASI KOLOM ---
+        # --- INTELLIGENT FEATURE SYNCHRONIZATION ---
         try:
-            expected_features = model.feature_names_in_
-            
-            # Buang fitur yang ada di df_input tapi tidak diminta model (misal karena Anda nge-drop di notebook)
+            # 1. Buang kolom yang tidak digunakan oleh model Anda di notebook
             for col in df_input.columns:
                 if col not in expected_features:
                     df_input = df_input.drop(columns=[col])
                     
-            # Jika ada kolom yang terlupakan, isi dengan 0 sebagai pengaman
+            # 2. Jika ada kolom model yang tidak sengaja terhapus, tambahkan dengan nilai default 0
             for col in expected_features:
                 if col not in df_input.columns:
                     df_input[col] = 0
                     
-            # Pastikan urutan persis
+            # 3. Urutkan posisi kolom agar 100% sama dengan saat model dilatih
             df_input = df_input[expected_features]
             
-            # --- EKSEKUSI PREDIKSI ---
+            # --- EKSEKUSI PREDIKSI BINARY (DROPOUT VS GRADUATE) ---
             prediction = model.predict(df_input)[0]
             probabilities = model.predict_proba(df_input)[0]
             
-            # Tampilan Hasil (Hanya 2 Kelas: Dropout vs Graduate)
             res_col1, res_col2 = st.columns([1, 2])
             
             with res_col1:
                 st.subheader("Hasil Keputusan")
-                # Ingat: Indeks 0 = Dropout, Indeks 1 = Graduate
+                # Jika model mendeteksi kelas 0 (Dropout)
                 if prediction == 0:
                     st.error("🔴 DROPOUT")
                     st.caption("Peringkat Risiko: KRITIS")
+                # Jika model mendeteksi kelas 1 (Graduate)
                 else:
                     st.success("🟢 GRADUATE")
                     st.caption("Peringkat Risiko: AMAN")
@@ -182,25 +160,29 @@ with tab1:
                 st.write(f"Risiko Dropout: **{probabilities[0]:.1%}**")
                 st.progress(float(probabilities[0]))
                 
-                st.write(f"Potensi Lulus: **{probabilities[1]:.1%}**")
+                st.write(f"Potensi Lulus (Graduate): **{probabilities[1]:.1%}**")
                 st.progress(float(probabilities[1]))
                 
         except Exception as e:
-            st.error(f"Terjadi kesalahan pada struktur data: {e}")
+            st.error(f"Terjadi kesalahan sinkronisasi fitur: {e}")
 
 # ==========================================
-# 4. TAB 2: INSIGHT MODEL
+# 4. TAB 2: INSIGHT MODEL (FEATURE IMPORTANCE)
 # ==========================================
 with tab2:
-    st.subheader("Fitur Paling Berpengaruh (Feature Importance)")
+    st.subheader("Bagaimana Algoritma Mengambil Keputusan?")
+    st.write("Grafik di bawah ini di-generate secara otomatis dari model AI untuk menunjukkan indikator apa yang paling krusial bagi kelulusan mahasiswa.")
     
-    importances = model.feature_importances_
-    feature_names = model.feature_names_in_
-
-    fi_df = pd.DataFrame({'Fitur': feature_names, 'Pengaruh (%)': importances * 100})
-    fi_df = fi_df.sort_values(by='Pengaruh (%)', ascending=False).head(10)
-    
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(x='Pengaruh (%)', y='Fitur', data=fi_df, palette='viridis', ax=ax)
-    plt.tight_layout()
-    st.pyplot(fig)
+    try:
+        importances = model.feature_importances_
+        
+        fi_df = pd.DataFrame({'Fitur': expected_features, 'Pengaruh (%)': importances * 100})
+        fi_df = fi_df.sort_values(by='Pengaruh (%)', ascending=False).head(10)
+        
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.barplot(x='Pengaruh (%)', y='Fitur', data=fi_df, palette='magma', ax=ax)
+        ax.set_title("Top 10 Indikator Risiko", fontweight='bold')
+        plt.tight_layout()
+        st.pyplot(fig)
+    except Exception as e:
+        st.warning(f"Grafik Feature Importance belum dapat ditampilkan: {e}")
