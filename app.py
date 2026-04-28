@@ -171,18 +171,23 @@ with tab1:
 # ==========================================
 with tab2:
     st.subheader("Bagaimana Algoritma Mengambil Keputusan?")
-    st.write("Grafik di bawah ini di-generate secara otomatis dari model AI untuk menunjukkan indikator apa yang paling krusial bagi kelulusan mahasiswa.")
+    st.write("Grafik di bawah ini menunjukkan indikator historis yang paling krusial dalam menentukan kelulusan mahasiswa berdasarkan pelatihan algoritma Random Forest.")
     
     try:
+        # Menghitung Feature Importance statis agar konsisten dengan Notebook
         importances = model.feature_importances_
         
+        # Membuat DataFrame untuk Plotting
         fi_df = pd.DataFrame({'Fitur': expected_features, 'Pengaruh (%)': importances * 100})
+        # Urutkan berdasarkan Pengaruh (%) dari tinggi ke rendah, ambil Top 10
         fi_df = fi_df.sort_values(by='Pengaruh (%)', ascending=False).head(10)
         
         fig, ax = plt.subplots(figsize=(10, 6))
-        sns.barplot(x='Pengaruh (%)', y='Fitur', data=fi_df, palette='magma', ax=ax)
+        # Gunakan warna seragam agar terlihat profesional
+        sns.barplot(x='Pengaruh (%)', y='Fitur', data=fi_df, palette='viridis', ax=ax)
         ax.set_title("Top 10 Indikator Risiko", fontweight='bold')
         plt.tight_layout()
         st.pyplot(fig)
+        
     except Exception as e:
         st.warning(f"Grafik Feature Importance belum dapat ditampilkan: {e}")
